@@ -5,7 +5,7 @@ import random
 import urllib
 import urllib2
 
-# for sending images
+# sending images
 from PIL import Image
 import multipart
 
@@ -120,7 +120,7 @@ class WebhookHandler(webapp2.RequestHandler):
             elif text == '/image':
                 img = Image.new('RGB', (512, 512))
                 base = random.randint(0, 16777216)
-                pixels = [base+i*j for i in range(512) for j in range(512)]  # generate sample image
+                pixels = [base+i*j for i in range(512) for j in range(512)]
                 img.putdata(pixels)
                 output = StringIO.StringIO()
                 img.save(output, 'JPEG')
@@ -128,7 +128,7 @@ class WebhookHandler(webapp2.RequestHandler):
             else:
                 reply('You know, this sort of behaviour could qualify as sexual harassment.')
 
-        # CUSTOMIZE FROM HERE
+        # bot text reply's
 
         elif 'beach' in text:
             reply('dont forget to bring a towel')

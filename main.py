@@ -14,6 +14,10 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 import webapp2
 
+# Kraken Exchange
+from KrakenExchange import KrakenExchange
+from KrakenExchange import ASSETS
+
 TOKEN = '363749995:AAEMaasMVLSPqSuSr1MiEFcgQH_Yn88hlbg'
 
 BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
@@ -116,7 +120,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 reply('Bot disabled')
                 setEnabled(chat_id, False)
             elif text == '/rules':
-                reply('1. You do not talk about WHALE HUNTERS \n2. You DO NOT talk about WHALE HUNTERS \n3. Master level of TA skills required \n4. Inactive members will be banned')
+                reply('1. You do not talk about WHALE HUNTERS \n2. You DO NOT talk about WHALE HUNTERS \n3. Master level of TA skills required \n3.141592 Bring pie \n4. Inactive members will be banned')
             elif text == '/image':
                 img = Image.new('RGB', (512, 512))
                 base = random.randint(0, 16777216)
@@ -125,6 +129,26 @@ class WebhookHandler(webapp2.RequestHandler):
                 output = StringIO.StringIO()
                 img.save(output, 'JPEG')
                 reply(img=output.getvalue())
+            elif text == '/assets' or text == '/pairs':
+                # assets = KrakenExchange().getAssetPairs()
+                r = 'Reply with /<assetpair> to get bid/ask prices\n\n'
+                for asset in ASSETS.keys():
+                    r += '{} \n'.format(asset)
+                reply(r)
+            elif text.upper() in ASSETS.keys():
+                pair = text.upper()
+                kraken = KrakenExchange()
+                ticker = kraken.getTicker(pair=ASSETS[pair])
+                askPrice = float(ticker['Ask Price'][0])
+                bidPrice = float(ticker['Bid Price'][0])
+                price = (askPrice + bidPrice) / 2
+                highPrice = float(ticker['High'][0])
+                lowPrice = float(ticker['Low'][0])
+                time = kraken.serverTime['rfc1123']
+                r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {} \n\n_updated: {}_'.format(pair, price, highPrice, lowPrice, time)
+                reply(r)
+            elif len(text) == 6:
+                reply('This assetpair is not recognized. Pick one from the /assets list, stupid.')
             else:
                 reply('You know, this sort of behaviour could qualify as sexual harassment.')
 

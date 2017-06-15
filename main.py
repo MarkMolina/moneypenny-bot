@@ -136,6 +136,8 @@ class WebhookHandler(webapp2.RequestHandler):
             reply('look at the corner of your screen!')
         elif 'moon' in text:
             reply('http://www.louwmanexclusive.com/nl/brands/lamborghini/')
+        elif 'bitch' in text:
+            reply('dont talk to me like that!')    
         else:
             if getEnabled(chat_id):
                 reply('I got your message! (but I do not know how to answer)')

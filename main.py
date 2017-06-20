@@ -4,6 +4,14 @@ import logging
 import random
 import urllib
 import urllib2
+import time
+import math
+
+import requests
+import requests_toolbelt.adapters.appengine
+# Use the App Engine Requests adapter. This makes sure that Requests uses
+# URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
 
 # sending images
 from PIL import Image
@@ -116,7 +124,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 reply('Bot disabled')
                 setEnabled(chat_id, False)
             elif text == '/rules':
-                reply('1. You do not talk about WHALE HUNTERS \n2. You DO NOT talk about WHALE HUNTERS \n3. Master level of TA skills required \n4. Inactive members will be banned')
+                reply('1. You do not talk about WHALE HUNTERS \n2. You DO NOT talk about WHALE HUNTERS \n3. Master level of TA skills required \n3.141592 Bring pie \n4. Inactive members will be banned')
             elif text == '/image':
                 img = Image.new('RGB', (512, 512))
                 base = random.randint(0, 16777216)
@@ -125,6 +133,43 @@ class WebhookHandler(webapp2.RequestHandler):
                 output = StringIO.StringIO()
                 img.save(output, 'JPEG')
                 reply(img=output.getvalue())
+            elif text == '/help' or text == '/options':
+                r = '/rules : show rules\n/image : generate an image\n/time(s) : get server time\n/assets : list of assets\n/pairs : list of all pairs (long)\n/<asset> : show this assets pairs\n/<assetpair> : show assetpairs price'
+                reply(r)
+            elif text == '/time' or text == '/times':
+                time = KrakenExchange().getServerTime()['rfc1123']
+                r = 'Kraken server time: {}'.format(time)
+                reply(r)
+            elif text == '/assets':
+                r = 'Reply with /<asset> to get its pairs\n{}'.format(', '.join(ASSETS))
+                reply(r)
+            elif text == '/pairs':
+                assets = ASSETPAIRS.keys()
+                assets.sort()
+                r = 'Reply with /<assetpair> to get bid/ask prices\n{}'.format(', '.join(assets))
+                reply(r)
+            elif text[1:].upper() in ASSETS:
+                pairs = []
+                for pair in ASSETPAIRS:
+                    if pair[:3] == text[1:].upper()[:3]:
+                        pairs.append(pair)
+                r = 'Reply with /<assetpair> to get bid/ask prices\n{}'.format(', '.join(pairs))
+                reply(r)
+            elif text[1:].upper() in ASSETPAIRS.keys():
+                pair = text[1:].upper()
+                kraken = KrakenExchange()
+                ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
+                askPrice = float(ticker['Ask Price'][0])
+                bidPrice = float(ticker['Bid Price'][0])
+                price = (askPrice + bidPrice) / 2
+                highPrice = float(ticker['High'][0])
+                lowPrice = float(ticker['Low'][0])
+                # time = kraken.serverTime['rfc1123']
+                r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
+                # r += '\n\n_updated: {}_'.format(time)
+                reply(r)
+            elif len(text) == 4 or len(text) == 7:
+                reply('This asset(pair) is not recognized. Pick one from the /assets list, stupid.')
             else:
                 reply('You know, this sort of behaviour could qualify as sexual harassment.')
 
@@ -137,12 +182,136 @@ class WebhookHandler(webapp2.RequestHandler):
         elif 'moon' in text:
             reply('http://www.louwmanexclusive.com/nl/brands/lamborghini/')
         elif 'bitch' in text:
-            reply('dont talk to me like that!')    
+            reply('dont talk to me like that!')
         else:
             if getEnabled(chat_id):
                 reply('I got your message! (but I do not know how to answer)')
             else:
                 logging.info('not enabled for chat_id {}'.format(chat_id))
+
+
+
+# ===== Kraken Exchange methods & classes ======
+
+PUBLIC_URLS = {
+    'time': 'https://api.kraken.com/0/public/Time',
+    'assets': 'https://api.kraken.com/0/public/Assets',
+    'assetPairs': 'https://api.kraken.com/0/public/AssetPairs',
+    'ticker': 'https://api.kraken.com/0/public/Ticker',
+    'ohlc': 'https://api.kraken.com/0/public/OHLC',
+    'orderBook': 'https://api.kraken.com/0/public/Depth',
+    'recentTrades': 'https://api.kraken.com/0/public/Trades',
+    'spread': 'https://api.kraken.com/0/public/Spread',
+}
+
+TICKER_MAPPING = {
+    'a': 'Ask Price',
+    'b': 'Bid Price',
+    'c': 'Last Trade',
+    'v': 'Volume',
+    'p': 'Volume weighted avg',
+    't': '# Trades',
+    'l': 'Low',
+    'h': 'High',
+    'o': 'Opening Price',
+}
+
+ASSETS = ['DASH', 'ETC', 'ETH', 'GNO', 'ICN', 'LTC', 'MLN', 'REP', 'USDT',
+          'XBT', 'XDG', 'XLM', 'XMR', 'XRP', 'ZEC']
+
+ASSETPAIRS = {
+    'DASHEUR': 'DASHEUR',
+    'DASHUSD': 'DASHUSD',
+    'DASHXBT': 'DASHXBT',
+    'ETCETH': 'XETCXETH',
+    'ETCEUR': 'XETCZEUR',
+    'ETCUSD': 'XETCZUSD',
+    'ETCXBT': 'XETCXXBT',
+    'ETHCAD': 'XETHZCAD',
+    'ETHEUR': 'XETHZEUR',
+    'ETHGBP': 'XETHZGBP',
+    'ETHJPY': 'XETHZJPY',
+    'ETHUSD': 'XETHZUSD',
+    'ETHXBT': 'XETHXXBT',
+    'GNOETH': 'GNOETH',
+    'GNOEUR': 'GNOEUR',
+    'GNOUSD': 'GNOUSD',
+    'GNOXBT': 'GNOXBT',
+    'ICNETH': 'XICNXETH',
+    'ICNXBT': 'XICNXXBT',
+    'LTCEUR': 'XLTCZEUR',
+    'LTCUSD': 'XLTCZUSD',
+    'LTCXBT': 'XLTCXXBT',
+    'MLNETH': 'XMLNXETH',
+    'MLNXBT': 'XMLNXXBT',
+    'REPETH': 'XREPXETH',
+    'REPEUR': 'XREPZEUR',
+    'REPUSD': 'XREPZUSD',
+    'REPXBT': 'XREPXXBT',
+    'USDTUSD': 'USDTZUSD',
+    'XBTCAD': 'XXBTZCAD',
+    'XBTEUR': 'XXBTZEUR',
+    'XBTGBP': 'XXBTZGBP',
+    'XBTJPY': 'XXBTZJPY',
+    'XBTUSD': 'XXBTZUSD',
+    'XDGXBT': 'XXDGXXBT',
+    'XLMEUR': 'XXLMZEUR',
+    'XLMUSD': 'XXLMZUSD',
+    'XLMXBT': 'XXLMXXBT',
+    'XMREUR': 'XXMRZEUR',
+    'XMRUSD': 'XXMRZUSD',
+    'XMRXBT': 'XXMRXXBT',
+    'XRPCAD': 'XXRPZCAD',
+    'XRPEUR': 'XXRPZEUR',
+    'XRPJPY': 'XXRPZJPY',
+    'XRPUSD': 'XXRPZUSD',
+    'XRPXBT': 'XXRPXXBT',
+    'ZECEUR': 'XZECZEUR',
+    'ZECUSD': 'XZECZUSD',
+    'ZECXBT': 'XZECXXBT'
+}
+
+MAXREQUESTS = 15
+
+def _query(url, header):
+    r = requests.post(url, data=header)
+    if r.status_code == 200:
+        return json.loads(r.text)['result']
+
+
+class KrakenExchange(object):
+    """
+    Holds all methods for fetching Assets, Assetpairs and current Ticker
+    values from the Kraken Exchange.
+    Time Skew can be displayed by requesting server time.
+    """
+    def __init__(self):
+        super(KrakenExchange, self).__init__()
+
+    def query_public(self, type, header=None):
+        return _query(PUBLIC_URLS[type], header)
+
+    def getServerTime(self):
+        serverTime = self.query_public('time')
+        if type(serverTime) == ValueError:
+            return serverTime.message
+        self.serverTime = serverTime
+        return self.serverTime
+
+    def getServerSkew(self):
+        self.serverSkew = time.time() - self.getServerTime()['unixtime']
+        return self.serverSkew
+
+    def getTicker(self, pair):
+        header = {'pair': pair} if pair else None
+        r = self.query_public('ticker', header)
+        if type(r) == ValueError:
+            return r.message
+        self.ticker = {}
+        ticker = r[pair]
+        for t in ticker.keys():
+            self.ticker[TICKER_MAPPING[t]] = ticker[t]
+        return self.ticker
 
 
 app = webapp2.WSGIApplication([

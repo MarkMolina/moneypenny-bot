@@ -101,6 +101,7 @@ class WebhookHandler(webapp2.RequestHandler):
                     'text': msg.encode('utf-8'),
                     'disable_web_page_preview': 'true',
                     'reply_to_message_id': str(message_id),
+                    'parse_mode': 'Markdown'
                 })).read()
             elif img:
                 resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [

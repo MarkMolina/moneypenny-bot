@@ -217,13 +217,17 @@ TICKER_MAPPING = {
     'o': 'Opening Price',
 }
 
-ASSETS = ['DASH', 'ETC', 'ETH', 'GNO', 'ICN', 'LTC', 'MLN', 'REP', 'USDT',
+ASSETS = ['DASH', 'EOS', 'ETC', 'ETH', 'GNO', 'ICN', 'LTC', 'MLN', 'REP', 'USDT',
           'XBT', 'XDG', 'XLM', 'XMR', 'XRP', 'ZEC']
 
 ASSETPAIRS = {
     'DASHEUR': 'DASHEUR',
     'DASHUSD': 'DASHUSD',
     'DASHXBT': 'DASHXBT',
+    'EOSETH': 'EOSETH',
+    'EOSEUR': 'EOSEUR',
+    'EOSUSD': 'EOSUSD',
+    'EOSXBT': 'EOSXBT',
     'ETCETH': 'XETCXETH',
     'ETCEUR': 'XETCZEUR',
     'ETCUSD': 'XETCZUSD',

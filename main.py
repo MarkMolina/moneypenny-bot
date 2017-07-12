@@ -101,6 +101,7 @@ class WebhookHandler(webapp2.RequestHandler):
                     'text': msg.encode('utf-8'),
                     'disable_web_page_preview': 'true',
                     'reply_to_message_id': str(message_id),
+                    'parse_mode': 'Markdown'
                 })).read()
             elif img:
                 resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
@@ -216,13 +217,17 @@ TICKER_MAPPING = {
     'o': 'Opening Price',
 }
 
-ASSETS = ['DASH', 'ETC', 'ETH', 'GNO', 'ICN', 'LTC', 'MLN', 'REP', 'USDT',
+ASSETS = ['DASH', 'EOS', 'ETC', 'ETH', 'GNO', 'ICN', 'LTC', 'MLN', 'REP', 'USDT',
           'XBT', 'XDG', 'XLM', 'XMR', 'XRP', 'ZEC']
 
 ASSETPAIRS = {
     'DASHEUR': 'DASHEUR',
     'DASHUSD': 'DASHUSD',
     'DASHXBT': 'DASHXBT',
+    'EOSETH': 'EOSETH',
+    'EOSEUR': 'EOSEUR',
+    'EOSUSD': 'EOSUSD',
+    'EOSXBT': 'EOSXBT',
     'ETCETH': 'XETCXETH',
     'ETCEUR': 'XETCZEUR',
     'ETCUSD': 'XETCZUSD',

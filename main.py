@@ -158,7 +158,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 reply(r)
 
             elif text.split(' ')[0][1:] in ASSETPAIRS.keys():
-                pair = text.split(' ')[0][1:]
+                pair = text.split(' ')[0][1:].upper()
                 kraken = KrakenExchange()
                 ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
                 askPrice = float(ticker['Ask Price'][0])

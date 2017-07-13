@@ -184,7 +184,7 @@ class WebhookHandler(webapp2.RequestHandler):
                         order_book = kraken.getOrderBook(pair=ASSETPAIRS[pair])
                         book = order_book[ASSETPAIRS[pair]]
                         r = "*OrderBook* {0} \n*Asks*\n{1}\n\n*Bids*\n{2}".format(
-                            ASSETPAIRS[pair],
+                            pair,
                             "\n".join(
                                 ["{} {}".format(ask[0], ask[1]) for ask in book['asks'][:10]]
                             ),

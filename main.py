@@ -169,17 +169,22 @@ class WebhookHandler(webapp2.RequestHandler):
                 # time = kraken.serverTime['rfc1123']
                 if len(text.split(' ')) > 1:
                     if text.split(' ')[1] == 'fib':
-                        l_one = highPrice
+                        l_one = lowPrice
                         l_two = highPrice - ((highPrice - lowPrice) * 0.236)
                         l_three = highPrice - ((highPrice - lowPrice) * 0.382)
                         l_four = highPrice - ((highPrice - lowPrice) * 0.5)
                         l_five = highPrice - ((highPrice - lowPrice) * 0.618)
                         l_six = highPrice - ((highPrice - lowPrice) * 0.786)
-                        l_seven = lowPrice
+                        l_seven = highPrice
                         l_eight = highPrice - ((highPrice - lowPrice) * 1.272)
                         l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
 
                         r = '*{0}* 24h fib levels\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
+                    if text.split(' ')[1] == 'book':
+                        order_book = kraken.getOrderBook(pair=ASSETPAIRS[pair])
+                        r = '*OrderBook* {0}'.format(
+                            order_book,
+                        )
                 else:
                     r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 # r += '\n\n_updated: {}_'.format(time)
@@ -321,6 +326,11 @@ class KrakenExchange(object):
     def getServerSkew(self):
         self.serverSkew = time.time() - self.getServerTime()['unixtime']
         return self.serverSkew
+
+    def getOrderBook(self, pair):
+        header = {'pair': pair} if pair else None
+        r = self.query_public('orderBook', header)
+        return r
 
     def getTicker(self, pair):
         header = {'pair': pair} if pair else None

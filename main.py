@@ -5,7 +5,7 @@ import random
 import urllib
 import urllib2
 import time
-import math 
+import math
 
 import requests
 import requests_toolbelt.adapters.appengine
@@ -167,20 +167,6 @@ class WebhookHandler(webapp2.RequestHandler):
                 highPrice = float(ticker['High'][0])
                 lowPrice = float(ticker['Low'][0])
                 # time = kraken.serverTime['rfc1123']
-<<<<<<< Updated upstream
-                if text.split(' ')[1] == 'fib':
-                    l_one = lowPrice
-                    l_two = highPrice - ((highPrice - lowPrice) * 0.236)
-                    l_three = highPrice - ((highPrice - lowPrice) * 0.382)
-                    l_four = highPrice - ((highPrice - lowPrice) * 0.5)
-                    l_five = highPrice - ((highPrice - lowPrice) * 0.618)
-                    l_six = highPrice - ((highPrice - lowPrice) * 0.786)
-                    l_seven = highPrice
-                    l_eight = highPrice - ((highPrice - lowPrice) * 1.272)
-                    l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
-
-                    r = '*{0}* 24h fib levels\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
-=======
                 if len(text.split(' ')) > 1:
                     if text.split(' ')[1] == 'fib':
                         l_one = lowPrice
@@ -194,8 +180,6 @@ class WebhookHandler(webapp2.RequestHandler):
                         l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
 
                         r = '*{0}* 24h fib levels\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
->>>>>>> Stashed changes
-
                 else:
                     r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 # r += '\n\n_updated: {}_'.format(time)

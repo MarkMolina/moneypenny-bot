@@ -14,11 +14,15 @@ import requests_toolbelt.adapters.appengine
 requests_toolbelt.adapters.appengine.monkeypatch()
 
 # sending images
-from PIL import Image
+try:
+    from PIL import Image
+except:
+    pass
 import multipart
 
 # standard app engineimports
 from google.appengine.api import urlfetch
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 import webapp2
 
@@ -26,6 +30,42 @@ TOKEN = '363749995:AAEMaasMVLSPqSuSr1MiEFcgQH_Yn88hlbg'
 
 BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
+
+def deffered_track_pair_price(pair, current_price, target_price, chat_id, message_id):
+    while True:
+        logging.info("Checking price alert..") 
+        time.sleep(30)
+        kraken = KrakenExchange()
+        ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
+        askPrice = float(ticker['Ask Price'][0])
+        bidPrice = float(ticker['Bid Price'][0])
+        live_price = (askPrice + bidPrice) / 2
+        if current_price < target_price and live_price >= target_price:
+            reply_message(
+                chat_id=chat_id, 
+                message_id=message_id, 
+                msg="{} just hit {}!".format(
+                    pair, live_price
+                )
+            )
+            break
+        elif current_price > target_price and live_price <= target_price:
+            reply_message(
+                chat_id=chat_id, 
+                message_id=message_id, 
+                msg="{} just hit {}!".format(
+                    pair, live_price
+                )
+            )
+            break
+
+def track_pair_price(pair, current_price, target_price, chat_id, message_id):
+    deferred.defer(
+        deffered_track_pair_price, 
+        pair, current_price, target_price, chat_id, message_id
+    )
+
+    
 
 # ================================
 
@@ -70,6 +110,30 @@ class SetWebhookHandler(webapp2.RequestHandler):
             self.response.write(json.dumps(json.load(urllib2.urlopen(BASE_URL + 'setWebhook', urllib.urlencode({'url': url})))))
 
 
+def reply_message(chat_id, message_id, msg=None, img=None):
+    if msg:
+        resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+            'chat_id': str(chat_id),
+            'text': msg.encode('utf-8'),
+            'disable_web_page_preview': 'true',
+            'reply_to_message_id': str(message_id),
+            'parse_mode': 'Markdown'
+        })).read()
+    elif img:
+        resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
+            ('chat_id', str(chat_id)),
+            ('reply_to_message_id', str(message_id)),
+        ], [
+            ('photo', 'image.jpg', img),
+        ])
+    else:
+        logging.error('no msg or img specified')
+        resp = None
+
+    logging.info('send response:')
+    logging.info(resp)
+
+
 class WebhookHandler(webapp2.RequestHandler):
     def post(self):
         urlfetch.set_default_fetch_deadline(60)
@@ -90,32 +154,12 @@ class WebhookHandler(webapp2.RequestHandler):
         chat = message['chat']
         chat_id = chat['id']
 
+        def reply(msg=None, img=None):
+            reply_message(msg=msg, img=img, chat_id=chat_id, message_id=message_id)
+
         if not text:
             logging.info('no text')
             return
-
-        def reply(msg=None, img=None):
-            if msg:
-                resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
-                    'chat_id': str(chat_id),
-                    'text': msg.encode('utf-8'),
-                    'disable_web_page_preview': 'true',
-                    'reply_to_message_id': str(message_id),
-                    'parse_mode': 'Markdown'
-                })).read()
-            elif img:
-                resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
-                    ('chat_id', str(chat_id)),
-                    ('reply_to_message_id', str(message_id)),
-                ], [
-                    ('photo', 'image.jpg', img),
-                ])
-            else:
-                logging.error('no msg or img specified')
-                resp = None
-
-            logging.info('send response:')
-            logging.info(resp)
 
         if text.startswith('/'):
             if text == '/start':
@@ -191,6 +235,12 @@ class WebhookHandler(webapp2.RequestHandler):
                             "\n".join(
                                 ["{} {}".format(bid[0], bid[1]) for bid in book['bids'][:10]]
                             ),
+                        )
+                    if text.split(' ')[1] == 'alert':
+                        target_price = text.split(' ')[2]
+                        track_pair_price(pair, price, target_price, chat_id, message_id)
+                        r = 'You want me to keep an eye on your {}? I will let you know if it rises or drops to {}'.format(
+                            pair, price
                         )
                         logging.info(r)
                 else:
@@ -336,7 +386,10 @@ class KrakenExchange(object):
         return self.serverSkew
 
     def getOrderBook(self, pair):
-        header = {'pair': pair} if pair else None
+        header = dict(
+            pair=pair,
+            count=10,
+        )
         r = self.query_public('orderBook', header)
         return r
 

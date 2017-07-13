@@ -4,10 +4,17 @@ runtime: python27
 api_version: 1
 threadsafe: yes
 
+builtins:
+- deferred: on
+
 handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+
+- url: /_ah/queue/deferred
+  login: admin
+  script: google.appengine.ext.deferred.deferred.application
 
 - url: /set_webhook
   login: admin

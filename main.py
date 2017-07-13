@@ -169,13 +169,13 @@ class WebhookHandler(webapp2.RequestHandler):
                 # time = kraken.serverTime['rfc1123']
                 if len(text.split(' ')) > 1:
                     if text.split(' ')[1] == 'fib':
-                        l_one = lowPrice
+                        l_one = highPrice
                         l_two = highPrice - ((highPrice - lowPrice) * 0.236)
                         l_three = highPrice - ((highPrice - lowPrice) * 0.382)
                         l_four = highPrice - ((highPrice - lowPrice) * 0.5)
                         l_five = highPrice - ((highPrice - lowPrice) * 0.618)
                         l_six = highPrice - ((highPrice - lowPrice) * 0.786)
-                        l_seven = highPrice
+                        l_seven = lowPrice
                         l_eight = highPrice - ((highPrice - lowPrice) * 1.272)
                         l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
 

@@ -201,7 +201,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 img.save(output, 'JPEG')
                 reply(img=output.getvalue())
             elif text == '/help' or text == '/options':
-                r = '/rules : show rules\n/image : generate an image\n/time(s) : get server time\n/assets : list of assets\n/pairs : list of all pairs (long)\n/<asset> : show this assets pairs\n/<assetpair> : show assetpairs price\nalerts : show alerts'
+                r = '/rules : show rules\n/image : generate an image\n/time(s) : get server time\n/assets : list of assets\n/pairs : list of all pairs (long)\n/<asset> : show this assets pairs\n/<assetpair> : show assetpairs price\n/alerts : show alerts'
                 reply(r)
             elif text == '/time' or text == '/times':
                 time = KrakenExchange().getServerTime()['rfc1123']

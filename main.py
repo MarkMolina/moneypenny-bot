@@ -33,7 +33,7 @@ BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
 def deffered_track_pair_price(pair, current_price, target_price, chat_id, message_id):
     while True:
-        logging.info("Checking price alert..") 
+        logging.info("Checking price alert..")
         time.sleep(30)
         kraken = KrakenExchange()
         ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
@@ -42,8 +42,8 @@ def deffered_track_pair_price(pair, current_price, target_price, chat_id, messag
         live_price = (askPrice + bidPrice) / 2
         if current_price < target_price and live_price >= target_price:
             reply_message(
-                chat_id=chat_id, 
-                message_id=message_id, 
+                chat_id=chat_id,
+                message_id=message_id,
                 msg="{} just hit {}!".format(
                     pair, live_price
                 )
@@ -51,8 +51,8 @@ def deffered_track_pair_price(pair, current_price, target_price, chat_id, messag
             break
         elif current_price > target_price and live_price <= target_price:
             reply_message(
-                chat_id=chat_id, 
-                message_id=message_id, 
+                chat_id=chat_id,
+                message_id=message_id,
                 msg="{} just hit {}!".format(
                     pair, live_price
                 )
@@ -61,11 +61,11 @@ def deffered_track_pair_price(pair, current_price, target_price, chat_id, messag
 
 def track_pair_price(pair, current_price, target_price, chat_id, message_id):
     deferred.defer(
-        deffered_track_pair_price, 
+        deffered_track_pair_price,
         pair, current_price, target_price, chat_id, message_id
     )
 
-    
+
 
 # ================================
 
@@ -240,7 +240,7 @@ class WebhookHandler(webapp2.RequestHandler):
                         target_price = text.split(' ')[2]
                         track_pair_price(pair, price, target_price, chat_id, message_id)
                         r = 'You want me to keep an eye on your {}? I will let you know if it rises or drops to {}'.format(
-                            pair, price
+                            pair, target_price
                         )
                         logging.info(r)
                 else:

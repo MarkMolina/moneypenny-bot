@@ -265,8 +265,7 @@ class WebhookHandler(webapp2.RequestHandler):
                             pair, target_price
                         )
                         logging.info(r)
-                else:
-                    r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
+                r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 # r += '\n\n_updated: {}_'.format(time)
                 reply(r)
             elif len(text) == 4 or len(text) == 7:

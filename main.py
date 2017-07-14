@@ -31,8 +31,13 @@ TOKEN = '363749995:AAEMaasMVLSPqSuSr1MiEFcgQH_Yn88hlbg'
 BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
 
+ALERTS = set()
+
+
 def deffered_track_pair_price(pair, current_price, target_price, chat_id, message_id):
-    while True:
+    alert_key = (pair, target_price)
+
+    while alert_key in ALERTS:
         logging.info("Checking price alert..")
         time.sleep(30)
         kraken = KrakenExchange()
@@ -48,6 +53,7 @@ def deffered_track_pair_price(pair, current_price, target_price, chat_id, messag
                     pair, live_price
                 )
             )
+            ALERTS.remove(alert_key)
             break
         elif current_price > target_price and live_price <= target_price:
             reply_message(
@@ -57,14 +63,19 @@ def deffered_track_pair_price(pair, current_price, target_price, chat_id, messag
                     pair, live_price
                 )
             )
+            ALERTS.remove(alert_key)
             break
 
+
 def track_pair_price(pair, current_price, target_price, chat_id, message_id):
+    ALERTS.add(
+        (pair, target_price)
+    )
+
     deferred.defer(
         deffered_track_pair_price,
         pair, current_price, target_price, chat_id, message_id
     )
-
 
 
 # ================================
@@ -165,6 +176,15 @@ class WebhookHandler(webapp2.RequestHandler):
             if text == '/start':
                 reply('Bot enabled')
                 setEnabled(chat_id, True)
+            if text == '/alerts':
+                reply(
+                    "*Alerts*\n{}".format(
+                        "\n".join([
+                            "{}: {}".format(pair, price)
+                            for pair, price in ALERTS
+                        ])
+                    )
+                )
             elif text == '/stop':
                 reply('Bot disabled')
                 setEnabled(chat_id, False)

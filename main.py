@@ -233,6 +233,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 highPrice = float(ticker['High'][0])
                 lowPrice = float(ticker['Low'][0])
                 # time = kraken.serverTime['rfc1123']
+                r = ""
                 if len(text.split(' ')) > 1:
                     if text.split(' ')[1] == 'fib':
                         l_one = highPrice
@@ -265,7 +266,8 @@ class WebhookHandler(webapp2.RequestHandler):
                             pair, target_price
                         )
                         logging.info(r)
-                r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
+                else:
+                    r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 # r += '\n\n_updated: {}_'.format(time)
                 reply(r)
             elif len(text) == 4 or len(text) == 7:

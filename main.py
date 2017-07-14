@@ -24,6 +24,7 @@ import multipart
 from google.appengine.api import urlfetch
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
+from google.appengine.api.taskqueue import TaskRetryOptions
 import webapp2
 
 TOKEN = '363749995:AAEMaasMVLSPqSuSr1MiEFcgQH_Yn88hlbg'
@@ -37,36 +38,33 @@ ALERTS = set()
 
 def deffered_track_pair_price(pair, current_price, target_price, chat_id, message_id):
     alert_key = (pair, target_price)
-
-    while alert_key in ALERTS:
-        logging.info("Checking price alert..{} if {}".format(pair, target_price))
-        time.sleep(30)
-        kraken = KrakenExchange()
-        ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
-        askPrice = float(ticker['Ask Price'][0])
-        bidPrice = float(ticker['Bid Price'][0])
-        live_price = (askPrice + bidPrice) / 2
-        target_price = float(target_price)
-        if current_price < target_price and live_price >= target_price:
-            reply_message(
-                chat_id=chat_id,
-                message_id=message_id,
-                msg="{} just hit {}!".format(
-                    pair, live_price
-                )
+    logging.info("Checking price alert..{} if {}".format(pair, target_price))
+    kraken = KrakenExchange()
+    ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
+    askPrice = float(ticker['Ask Price'][0])
+    bidPrice = float(ticker['Bid Price'][0])
+    live_price = (askPrice + bidPrice) / 2
+    target_price = float(target_price)
+    if current_price < target_price and live_price >= target_price:
+        ALERTS.remove(alert_key)
+        reply_message(
+            chat_id=chat_id,
+            message_id=message_id,
+            msg="{} just hit {}!".format(
+                pair, live_price
             )
-            ALERTS.remove(alert_key)
-            break
-        elif current_price > target_price and live_price <= target_price:
-            reply_message(
-                chat_id=chat_id,
-                message_id=message_id,
-                msg="{} just hit {}!".format(
-                    pair, live_price
-                )
+        )
+    elif current_price > target_price and live_price <= target_price:
+        ALERTS.remove(alert_key)
+        reply_message(
+            chat_id=chat_id,
+            message_id=message_id,
+            msg="{} just hit {}!".format(
+                pair, live_price
             )
-            ALERTS.remove(alert_key)
-            break
+        )
+    else:
+        raise Exception("Alert not hit, fail task so it is retried")
 
 
 def track_pair_price(pair, current_price, target_price, chat_id, message_id):
@@ -76,7 +74,11 @@ def track_pair_price(pair, current_price, target_price, chat_id, message_id):
 
     deferred.defer(
         deffered_track_pair_price,
-        pair, current_price, target_price, chat_id, message_id
+        pair, current_price, target_price, chat_id, message_id,
+        _retry_options=TaskRetryOptions(
+            min_backoff_seconds=60,
+            task_age_limit=86400
+        ) # 1 day
     )
 
 

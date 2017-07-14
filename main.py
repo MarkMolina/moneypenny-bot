@@ -260,12 +260,15 @@ class WebhookHandler(webapp2.RequestHandler):
                             ),
                         )
                     if text.split(' ')[1] == 'alert':
-                        target_price = text.split(' ')[2]
-                        track_pair_price(pair, price, target_price, chat_id, message_id)
-                        r = 'You want me to keep an eye on your {}? I will let you know if it rises or drops to {}'.format(
-                            pair, target_price
-                        )
-                        logging.info(r)
+                        try:
+                            target_price = text.split(' ')[2]
+                            track_pair_price(pair, price, target_price, chat_id, message_id)
+                            r = 'You want me to keep an eye on your {}? I will let you know if it rises or drops to {}'.format(
+                                pair, target_price
+                            )
+                            logging.info(r)
+                        except IndexError:
+                            r = 'Tell me what price you want an alert for, doofus!'
                 else:
                     r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 # r += '\n\n_updated: {}_'.format(time)

@@ -30,6 +30,7 @@ TOKEN = '363749995:AAEMaasMVLSPqSuSr1MiEFcgQH_Yn88hlbg'
 
 BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
+urlfetch.set_default_fetch_deadline(60)
 
 ALERTS = set()
 
@@ -38,7 +39,7 @@ def deffered_track_pair_price(pair, current_price, target_price, chat_id, messag
     alert_key = (pair, target_price)
 
     while alert_key in ALERTS:
-        logging.info("Checking price alert..")
+        logging.info("Checking price alert..{} if {}".format(pair, target_price))
         time.sleep(30)
         kraken = KrakenExchange()
         ticker = kraken.getTicker(pair=ASSETPAIRS[pair])

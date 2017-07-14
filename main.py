@@ -46,6 +46,7 @@ def deffered_track_pair_price(pair, current_price, target_price, chat_id, messag
         askPrice = float(ticker['Ask Price'][0])
         bidPrice = float(ticker['Bid Price'][0])
         live_price = (askPrice + bidPrice) / 2
+        target_price = float(target_price)
         if current_price < target_price and live_price >= target_price:
             reply_message(
                 chat_id=chat_id,
@@ -200,7 +201,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 img.save(output, 'JPEG')
                 reply(img=output.getvalue())
             elif text == '/help' or text == '/options':
-                r = '/rules : show rules\n/image : generate an image\n/time(s) : get server time\n/assets : list of assets\n/pairs : list of all pairs (long)\n/<asset> : show this assets pairs\n/<assetpair> : show assetpairs price'
+                r = '/rules : show rules\n/image : generate an image\n/time(s) : get server time\n/assets : list of assets\n/pairs : list of all pairs (long)\n/<asset> : show this assets pairs\n/<assetpair> : show assetpairs price\nalerts : show alerts'
                 reply(r)
             elif text == '/time' or text == '/times':
                 time = KrakenExchange().getServerTime()['rfc1123']

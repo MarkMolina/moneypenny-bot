@@ -284,6 +284,8 @@ class WebhookHandler(webapp2.RequestHandler):
 
         elif 'beach' in text:
             reply('dont forget to bring a towel')
+        elif 'penny' in text:
+            reply('Dont talk behind my back!')
         elif 'what time' in text:
             reply('look at the corner of your screen!')
         elif 'moon' in text:

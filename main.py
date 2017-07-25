@@ -383,12 +383,7 @@ ASSETPAIRS = {
     'XRPXBT': 'XXRPXXBT',
     'ZECEUR': 'XZECZEUR',
     'ZECUSD': 'XZECZUSD',
-    'ZECXBT': 'XZECXXBT',
-    'BTCCAD': 'XXBTZCAD', # FIXME: dirty fix/hack for people who forget to type XBT instead of BTC
-    'BTCEUR': 'XXBTZEUR',
-    'BTCGBP': 'XXBTZGBP',
-    'BTCJPY': 'XXBTZJPY',
-    'BTCUSD': 'XXBTZUSD'
+    'ZECXBT': 'XZECXXBT'
 }
 
 MAXREQUESTS = 15

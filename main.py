@@ -328,7 +328,7 @@ TICKER_MAPPING = {
 }
 
 ASSETS = ['DASH', 'EOS', 'ETC', 'ETH', 'GNO', 'ICN', 'LTC', 'MLN', 'REP', 'USDT',
-          'XBT', 'XDG', 'XLM', 'XMR', 'XRP', 'ZEC']
+          'XBT', 'XDG', 'XLM', 'XMR', 'XRP', 'ZEC', 'BCH']
 
 ASSETPAIRS = {
     'DASHEUR': 'DASHEUR',
@@ -383,7 +383,10 @@ ASSETPAIRS = {
     'XRPXBT': 'XXRPXXBT',
     'ZECEUR': 'XZECZEUR',
     'ZECUSD': 'XZECZUSD',
-    'ZECXBT': 'XZECXXBT'
+    'ZECXBT': 'XZECXXBT',
+    'BCHEUR': 'XBCHXEUR',
+    'BCHUSD': 'XBCHXUSD',
+    'BCHXBT': 'XBCHXXBT',
 }
 
 MAXREQUESTS = 15

@@ -6,6 +6,7 @@ import urllib
 import urllib2
 import time
 import math
+import re
 
 import requests
 import requests_toolbelt.adapters.appengine
@@ -225,8 +226,8 @@ class WebhookHandler(webapp2.RequestHandler):
                 r = 'Reply with /<assetpair> to get bid/ask prices\n{}'.format(', '.join(pairs))
                 reply(r)
 
-            elif text.split(' ')[0][1:].replace("btc", "xbt").upper() in ASSETPAIRS.keys():
-                pair = text.split(' ')[0][1:].upper()
+            elif re.sub('^btc$', 'xbt', text.split(' ')[0][1:].upper()) in ASSETPAIRS.keys():
+                pair = re.sub('^btc$', 'xbt', text.split(' ')[0][1:].upper())
                 kraken = KrakenExchange()
                 ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
                 askPrice = float(ticker['Ask Price'][0])

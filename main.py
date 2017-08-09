@@ -178,7 +178,8 @@ class WebhookHandler(webapp2.RequestHandler):
             return
 
         if text.startswith('/'):
-            text = re.sub('(\/btc|btc$)', 'xbt', text)
+            text = re.sub('(\/btc)', '/xbt', text)
+            text = re.sub('(btc$)', 'xbt', text)
             text = re.sub('(btc\s+)', 'xbt ', text)
             if text == '/start':
                 reply('Bot enabled')

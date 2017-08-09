@@ -178,6 +178,8 @@ class WebhookHandler(webapp2.RequestHandler):
             return
 
         if text.startswith('/'):
+            text = re.sub('(\/btc|btc$)', 'xbt', text)
+            text = re.sub('(btc\s+)', 'xbt ', text)
             if text == '/start':
                 reply('Bot enabled')
                 setEnabled(chat_id, True)
@@ -190,6 +192,7 @@ class WebhookHandler(webapp2.RequestHandler):
                         ])
                     )
                 )
+
             elif text == '/stop':
                 reply('Bot disabled')
                 setEnabled(chat_id, False)
@@ -226,8 +229,8 @@ class WebhookHandler(webapp2.RequestHandler):
                 r = 'Reply with /<assetpair> to get bid/ask prices\n{}'.format(', '.join(pairs))
                 reply(r)
 
-            elif re.sub('^btc$', 'xbt', text.split(' ')[0][1:].upper()) in ASSETPAIRS.keys():
-                pair = re.sub('^btc$', 'xbt', text.split(' ')[0][1:].upper())
+            elif text.split(' ')[0][1:].upper() in ASSETPAIRS.keys():
+                pair = text.split(' ')[0][1:].upper()
                 kraken = KrakenExchange()
                 ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
                 askPrice = float(ticker['Ask Price'][0])

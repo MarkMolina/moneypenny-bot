@@ -289,16 +289,16 @@ class WebhookHandler(webapp2.RequestHandler):
 
         elif 'beach' in text:
             reply('dont forget to bring a towel')
-        elif ('sell' in text or 'dropping' in text or 'dumping' in text) and random.choice([True, False]):
-            reply('weak hands!')
-        elif 'what time' in text:
-            reply('look at the corner of your screen!')
-        elif 'moon' in text:
-            reply('http://www.louwmanexclusive.com/nl/brands/lamborghini/')
-        elif 'bitch' in text:
-            reply('dont talk to me like that!')
-        elif 'penny' in text:
-            reply('Dont talk behind my back!')
+        # elif ('sell' in text or 'dropping' in text or 'dumping' in text) and random.choice([True, False]):
+        #     reply('weak hands!')
+        # elif 'what time' in text:
+        #     reply('look at the corner of your screen!')
+        # elif 'moon' in text:
+        #     reply('http://www.louwmanexclusive.com/nl/brands/lamborghini/')
+        # elif 'bitch' in text:
+        #     reply('dont talk to me like that!')
+        # elif 'penny' in text:
+        #     reply('Dont talk behind my back!')
         else:
             if getEnabled(chat_id):
                 reply('I got your message! (but I do not know how to answer)')

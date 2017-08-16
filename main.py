@@ -280,6 +280,36 @@ class WebhookHandler(webapp2.RequestHandler):
                     r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 # r += '\n\n_updated: {}_'.format(time)
                 reply(r)
+            elif text.split(' ')[0][1:].upper() in BITT_ASSETPAIRS.keys():
+                # TODO: insert bittrex methods here
+                pair = text.split(' ')[0][1:].upper() # Actually upper is not needed here
+                bittrex = BittrexExchange()
+                ticker = kraken.getTicker(pair=BITT_ASSETPAIRS[pair])
+                askPrice = float(ticker['Ask Price'][0])
+                bidPrice = float(ticker['Bid Price'][0])
+                price = (askPrice + bidPrice) / 2
+                highPrice = float(ticker['High'][0])
+                lowPrice = float(ticker['Low'][0])
+                r = ""
+                if len(text.split(' ')) > 1:
+                    if text.split(' ')[1] == 'fib':
+                        l_one = highPrice
+                        l_two = highPrice - ((highPrice - lowPrice) * 0.236)
+                        l_three = highPrice - ((highPrice - lowPrice) * 0.382)
+                        l_four = highPrice - ((highPrice - lowPrice) * 0.5)
+                        l_five = highPrice - ((highPrice - lowPrice) * 0.618)
+                        l_six = highPrice - ((highPrice - lowPrice) * 0.786)
+                        l_seven = lowPrice
+                        l_eight = highPrice - ((highPrice - lowPrice) * 1.272)
+                        l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
+
+                        r = '*{0}* 24h fib levels\n\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
+                else:
+                    r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
+                    reply(r)
+
+
+                
             elif len(text) == 4 or len(text) == 7:
                 reply('This asset(pair) is not recognized. Pick one from the /assets list, stupid.')
             else:
@@ -444,6 +474,73 @@ class KrakenExchange(object):
             self.ticker[TICKER_MAPPING[t]] = ticker[t]
         return self.ticker
 
+# ===== Bittrex Exchange methods & classes ======
+BITT_PUBLIC_URLS = {
+    'markets': 'https://bittrex.com/api/v1.1/public/getmarkets', # hold open markets, assets and pairs.
+    'currencies': 'https://bittrex.com/api/v1.1/public/getcurrencies ',
+    'ticker': 'https://bittrex.com/api/v1.1/public/getticker', # Just the current price and bid ask.
+    'summary': 'https://bittrex.com/api/v1.1/public/getmarketsummary', # > 1 market 24h summary, current high-low etc
+    'summaries': 'https://bittrex.com/api/v1.1/public/getmarketsummaries', # > 1 market 24h summary, current high-low etc
+    'orderBook': 'https://bittrex.com/api/v1.1/public/getorderbook',
+    'history': 'https://bittrex.com/api/v1.1/public/getmarkethistory'
+}
+
+BITT_ASSETPAIRS = {
+    'btc-ltc': 'btc-ltc'
+}
+
+BITT_TICKER_MAPPING = {
+    'MarketName': 'Pair',
+    'High': 'High',
+    'Low': 'Low',
+    'Volume': 'Volume',
+    'Last': 'Last',
+    'BaseVolume': 'Base Volume',
+    'Bid': 'Bid Price',
+    'Ask': 'Ask Price',
+    'OpenBuyOrders': '# Buy Orders',
+    'OpenSellOrders': '# Sell Orders'
+}
+
+# TODO: retrieve all pairs from the `getmarket` data. Pairs will have "-" which will be handy for separation.
+
+class BittrexExchange(object):
+    """
+    Holds all methods for fetching:
+     - Assets, Assetpairs, Current Ticker, 24h summary, order book, and history
+    values and current Ticker
+    values from the Kraken Exchange.
+    Time Skew can be displayed by requesting server time.
+    """
+    def __init__(self):
+        super(BittrexExchange, self).__init__()
+
+
+    def query_public(self, type, header=None):
+        return _query(PUBLIC_URLS[type], header)
+
+    def getTicker(self, pair):
+        header = {'market': pair} if pair else None
+        r = self.query_public('summary', header)
+        if type(r) == ValueError:
+            return r.message
+        self.ticker = {}
+
+        ticker = r
+        print(ticker['Last'])
+        for t in ticker.keys():
+            self.ticker[t] = ticker[t]
+
+        for t in ticker.keys():
+            self.ticker[BITT_TICKER_MAPPING[t]] = ticker[t]
+        return self.ticker
+
+bittrex = BittrexExchange()
+h=bittrex.getTicker(pair='btc-ltc')
+h['Ask']
+
+r = requests.post('https://bittrex.com/api/v1.1/public/getticker', data={'market':'btc-ltc'})
+json.loads(r.text)['result']['Last']
 
 app = webapp2.WSGIApplication([
     ('/me', MeHandler),

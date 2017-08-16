@@ -309,7 +309,7 @@ class WebhookHandler(webapp2.RequestHandler):
                     reply(r)
 
 
-                
+
             elif len(text) == 4 or len(text) == 7:
                 reply('This asset(pair) is not recognized. Pick one from the /assets list, stupid.')
             else:
@@ -501,7 +501,7 @@ BITT_TICKER_MAPPING = {
     'OpenBuyOrders': '# Buy Orders',
     'OpenSellOrders': '# Sell Orders'
 }
-
+# test
 # TODO: retrieve all pairs from the `getmarket` data. Pairs will have "-" which will be handy for separation.
 
 class BittrexExchange(object):

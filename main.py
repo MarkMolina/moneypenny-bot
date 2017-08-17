@@ -426,6 +426,7 @@ ASSETPAIRS = {
 
 MAXREQUESTS = 15
 
+
 def _query(url, header):
     r = requests.post(url, data=header)
     if r.status_code == 200:
@@ -474,19 +475,25 @@ class KrakenExchange(object):
             self.ticker[TICKER_MAPPING[t]] = ticker[t]
         return self.ticker
 
+
 # ===== Bittrex Exchange methods & classes ======
 BITT_PUBLIC_URLS = {
-    'markets': 'https://bittrex.com/api/v1.1/public/getmarkets', # hold open markets, assets and pairs.
+    # hold open markets, assets and pairs.
+    'markets': 'https://bittrex.com/api/v1.1/public/getmarkets',
     'currencies': 'https://bittrex.com/api/v1.1/public/getcurrencies ',
-    'ticker': 'https://bittrex.com/api/v1.1/public/getticker', # Just the current price and bid ask.
-    'summary': 'https://bittrex.com/api/v1.1/public/getmarketsummary', # > 1 market 24h summary, current high-low etc
-    'summaries': 'https://bittrex.com/api/v1.1/public/getmarketsummaries', # > 1 market 24h summary, current high-low etc
+    # Just the current price and bid ask.
+    'ticker': 'https://bittrex.com/api/v1.1/public/getticker',
+    # > 1 market 24h summary, current high-low etc
+    'summary': 'https://bittrex.com/api/v1.1/public/getmarketsummary',
+    # > 1 market 24h summary, current high-low etc
+    'summaries': 'https://bittrex.com/api/v1.1/public/getmarketsummaries',
     'orderBook': 'https://bittrex.com/api/v1.1/public/getorderbook',
     'history': 'https://bittrex.com/api/v1.1/public/getmarkethistory'
 }
 
 BITT_ASSETPAIRS = {
-    'btc-ltc': 'btc-ltc'
+    'btc-ltc': 'btc-ltc',
+    'neo-btc': 'neo-btc'
 }
 
 BITT_TICKER_MAPPING = {
@@ -502,7 +509,8 @@ BITT_TICKER_MAPPING = {
     'OpenSellOrders': '# Sell Orders'
 }
 
-# TODO: retrieve all pairs from the `getmarket` data. Pairs will have "-" which will be handy for separation.
+# TODO: retrieve all pairs from the `getmarket` data. Pairs will have "-"
+#       which will be handy for separation.
 
 
 class BittrexExchange(object):
@@ -515,7 +523,6 @@ class BittrexExchange(object):
     """
     def __init__(self):
         super(BittrexExchange, self).__init__()
-
 
     def query_public(self, type, header=None):
         return _query(PUBLIC_URLS[type], header)
@@ -536,12 +543,6 @@ class BittrexExchange(object):
             self.ticker[BITT_TICKER_MAPPING[t]] = ticker[t]
         return self.ticker
 
-bittrex = BittrexExchange()
-h=bittrex.getTicker(pair='btc-ltc')
-h['Ask']
-
-r = requests.post('https://bittrex.com/api/v1.1/public/getticker', data={'market':'btc-ltc'})
-json.loads(r.text)['result']['Last']
 
 app = webapp2.WSGIApplication([
     ('/me', MeHandler),

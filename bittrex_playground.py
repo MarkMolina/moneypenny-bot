@@ -10,7 +10,6 @@ import re
 
 import requests
 
-from bittrex_params import BITT_ASSETPAIRS
 
 def _query(url, header):
     r = requests.post(url, data=header)
@@ -135,7 +134,7 @@ def main(text, bot_on=False):
 if __name__ == '__main__':
     r=main('/btc-ltc fib')
 
-    
+
 
     r
     r

@@ -179,9 +179,9 @@ class WebhookHandler(webapp2.RequestHandler):
             return
 
         if text.startswith('/'):
-            text = re.sub('(\/btc)', '/xbt', text)
-            text = re.sub('(btc$)', 'xbt', text)
-            text = re.sub('(btc\s+)', 'xbt ', text)
+            text_kraken = re.sub('(\/btc)', '/xbt', text)
+            text_kraken = re.sub('(btc$)', 'xbt', text)
+            text_kraken = re.sub('(btc\s+)', 'xbt ', text)
             if text == '/start':
                 reply('Bot enabled')
                 setEnabled(chat_id, True)
@@ -231,8 +231,8 @@ class WebhookHandler(webapp2.RequestHandler):
                 r = 'Reply with /<assetpair> to get bid/ask prices\n{}'.format(', '.join(pairs))
                 reply(r)
 
-            elif text.split(' ')[0][1:].upper() in ASSETPAIRS.keys():
-                pair = text.split(' ')[0][1:].upper()
+            elif text_kraken.split(' ')[0][1:].upper() in ASSETPAIRS.keys():
+                pair = text_kraken.split(' ')[0][1:].upper()
                 kraken = KrakenExchange()
                 ticker = kraken.getTicker(pair=ASSETPAIRS[pair])
                 askPrice = float(ticker['Ask Price'][0])
@@ -242,8 +242,8 @@ class WebhookHandler(webapp2.RequestHandler):
                 lowPrice = float(ticker['Low'][0])
                 # time = kraken.serverTime['rfc1123']
                 r = ""
-                if len(text.split(' ')) > 1:
-                    if text.split(' ')[1] == 'fib':
+                if len(text_kraken.split(' ')) > 1:
+                    if text_kraken.split(' ')[1] == 'fib':
                         l_one = highPrice
                         l_two = highPrice - ((highPrice - lowPrice) * 0.236)
                         l_three = highPrice - ((highPrice - lowPrice) * 0.382)
@@ -255,7 +255,7 @@ class WebhookHandler(webapp2.RequestHandler):
                         l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
 
                         r = '*{0}* 24h fib levels\n\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
-                    if text.split(' ')[1] == 'book':
+                    if text_kraken.split(' ')[1] == 'book':
                         order_book = kraken.getOrderBook(pair=ASSETPAIRS[pair])
                         book = order_book[ASSETPAIRS[pair]]
                         r = "*OrderBook* {0} \n*Asks*\n{1}\n\n*Bids*\n{2}".format(
@@ -267,9 +267,9 @@ class WebhookHandler(webapp2.RequestHandler):
                                 ["{} {}".format(bid[0], bid[1]) for bid in book['bids'][:10]]
                             ),
                         )
-                    if text.split(' ')[1] == 'alert':
+                    if text_kraken.split(' ')[1] == 'alert':
                         try:
-                            target_price = text.split(' ')[2]
+                            target_price = text_kraken.split(' ')[2]
                             track_pair_price(pair, price, target_price, chat_id, message_id)
                             r = 'You want me to keep an eye on your {}? I will let you know if it rises or drops to {}'.format(
                                 pair, target_price

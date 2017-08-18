@@ -297,7 +297,6 @@ class WebhookHandler(webapp2.RequestHandler):
 
                 if len(text.split(' ')) > 1:
                     if text.split(' ')[1] == 'fib':
-                        print 'yo'
                         l_one = highPrice
                         l_two = highPrice - ((highPrice - lowPrice) * 0.236)
                         l_three = highPrice - ((highPrice - lowPrice) * 0.382)
@@ -511,7 +510,7 @@ BITT_TICKER_MAPPING = {
 }
 
 BITT_ASSETPAIRS = [
-    u'BTC-LTC',
+     u'BTC-LTC',
      u'BTC-DOGE',
      u'BTC-VTC',
      u'BTC-PPC',

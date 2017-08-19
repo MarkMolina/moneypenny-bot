@@ -254,11 +254,11 @@ class WebhookHandler(webapp2.RequestHandler):
                         l_eight = highPrice - ((highPrice - lowPrice) * 1.272)
                         l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
 
-                        r = '*{0}* 24h fib levels\n\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
+                        r = '*KRAKEN:{0}* 24h fib levels\n\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
                     if text_kraken.split(' ')[1] == 'book':
                         order_book = kraken.getOrderBook(pair=ASSETPAIRS[pair])
                         book = order_book[ASSETPAIRS[pair]]
-                        r = "*OrderBook* {0} \n*Asks*\n{1}\n\n*Bids*\n{2}".format(
+                        r = "*OrderBook* KRAKEN:{0} \n*Asks*\n{1}\n\n*Bids*\n{2}".format(
                             pair,
                             "\n".join(
                                 ["{} {}".format(ask[0], ask[1]) for ask in book['asks'][:10]]
@@ -278,7 +278,7 @@ class WebhookHandler(webapp2.RequestHandler):
                         except IndexError:
                             r = 'Tell me what price you want an alert for, doofus!'
                 else:
-                    r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
+                    r = '*KRAKEN:{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 # r += '\n\n_updated: {}_'.format(time)
                 reply(r)
 
@@ -307,10 +307,10 @@ class WebhookHandler(webapp2.RequestHandler):
                         l_eight = highPrice - ((highPrice - lowPrice) * 1.272)
                         l_nine = highPrice - ((highPrice - lowPrice) * 1.618)
 
-                        r = '*{0}* 24h fib levels\n\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
+                        r = '*BITTREX:{0}* 24h fib levels\n\n*0%*: {1}\n*23.6%*: {2}\n*38.2%*: {3}\n*50%*: {4}\n*61.8%*: {5}\n*78.6%*: {6}\n*100%*: {7}\n\n*127.2%*: {8}\n*161.8%*: {9}\n'.format(pair, l_one, l_two, l_three, l_four, l_five, l_six, l_seven, l_eight, l_nine)
 
                 else:
-                    r = '*{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
+                    r = '*BITTREX:{}* \n*Price:* {} \n*---* \n*High:* {} \n*Low:* {}'.format(pair, price, highPrice, lowPrice)
                 reply(r)
 
 

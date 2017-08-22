@@ -324,8 +324,8 @@ class WebhookHandler(webapp2.RequestHandler):
 
         elif 'beach' in text:
             reply('dont forget to bring a towel')
-        elif ('sell' in text or 'dropping' in text or 'dumping' in text) and random.choice([True, False]):
-            reply('weak hands!')
+        # elif ('sell' in text or 'dropping' in text or 'dumping' in text) and random.choice([True, False]):
+        #     reply('weak hands!')
         # elif 'what time' in text:
         #     reply('look at the corner of your screen!')
         # elif 'moon' in text:

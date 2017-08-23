@@ -223,6 +223,9 @@ class WebhookHandler(webapp2.RequestHandler):
                 assets.sort()
                 r = 'Reply with /<assetpair> to get bid/ask prices\n{}'.format(', '.join(assets))
                 reply(r)
+            elif text == '/magic':
+                r = 'https://media.giphy.com/media/12NUbkX6p4xOO4/giphy.gif'
+                reply(r)
             elif text[1:].upper() in ASSETS:
                 pairs = []
                 for pair in ASSETPAIRS:

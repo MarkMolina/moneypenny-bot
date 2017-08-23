@@ -128,24 +128,28 @@ class SetWebhookHandler(webapp2.RequestHandler):
 
 
 def reply_message(chat_id, message_id, msg=None, img=None):
-    if msg:
-        resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
-            'chat_id': str(chat_id),
-            'text': msg.encode('utf-8'),
-            'disable_web_page_preview': 'true',
-            'reply_to_message_id': str(message_id),
-            'parse_mode': 'Markdown'
-        })).read()
-    elif img:
-        resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
-            ('chat_id', str(chat_id)),
-            ('reply_to_message_id', str(message_id)),
-        ], [
-            ('photo', 'image.jpg', img),
-        ])
-    else:
-        logging.error('no msg or img specified')
-        resp = None
+    try:
+        if msg:
+            resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+                'chat_id': str(chat_id),
+                'text': msg.encode('utf-8'),
+                'disable_web_page_preview': 'true',
+                'reply_to_message_id': str(message_id),
+                'parse_mode': 'Markdown'
+            })).read()
+        elif img:
+            resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
+                ('chat_id', str(chat_id)),
+                ('reply_to_message_id', str(message_id)),
+            ], [
+                ('photo', 'image.jpg', img),
+            ])
+        else:
+            logging.error('no msg or img specified')
+            resp = None
+    except Exception as exc:
+        logging.error("ERROR %s" % exc)
+        pass
 
     logging.info('send response:')
     logging.info(resp)

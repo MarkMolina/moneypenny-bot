@@ -128,6 +128,8 @@ class SetWebhookHandler(webapp2.RequestHandler):
 
 
 def reply_message(chat_id, message_id, msg=None, img=None):
+    resp = ''
+
     try:
         if msg:
             resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({

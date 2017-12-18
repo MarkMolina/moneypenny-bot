@@ -353,6 +353,8 @@ class WebhookHandler(webapp2.RequestHandler):
         # elif 'kraken' in text.lower():
         #     fuck_kraken = ['Haha! Kraken...', 'Fuck Kraken!', 'Anything but kraken', 'Kra-what?', 'How about no?']
         #     reply(random.choice(fuck_kraken))
+        elif 'ratio' in text.lower():
+            reply("Haha, Pan Sai will make fun of you and not explain. You Better know what you mean.")
         else:
             if getEnabled(chat_id):
                 reply('I got your message! (but I do not know how to answer)')

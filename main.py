@@ -200,8 +200,8 @@ class WebhookHandler(webapp2.RequestHandler):
             text = text.replace('@whale_hunters_bot', '')
 
             text_kraken = re.sub('(/btc)', '/xbt', text)
-            text_kraken = re.sub('(btc$)', 'xbt', text)
-            text_kraken = re.sub('(btc\s+)', 'xbt ', text)
+            text_kraken = re.sub('(btc$)', 'xbt', text_kraken)
+            text_kraken = re.sub('(btc\s+)', 'xbt ', text_kraken)
             if text == '/start':
                 reply('Bot enabled')
                 setEnabled(chat_id, True)

@@ -194,7 +194,12 @@ class WebhookHandler(webapp2.RequestHandler):
             return
 
         if text.startswith('/'):
-            text_kraken = re.sub('(\/btc)', '/xbt', text)
+
+            # telegram sometimes appends @username if the command is used from within the client
+            # so we want to replace that
+            text = text.replace('@whale_hunters_bot', '')
+
+            text_kraken = re.sub('(/btc)', '/xbt', text)
             text_kraken = re.sub('(btc$)', 'xbt', text)
             text_kraken = re.sub('(btc\s+)', 'xbt ', text)
             if text == '/start':
